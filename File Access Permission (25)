@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <pwd.h>
+
+void checkPermissions(struct stat *fileStat);
+void printPermissions(mode_t perm);
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <file_path>\n", argv[0]);
+        return 1;
+    }
+
+    const char *filePath = argv[1];
+    struct stat fileStat;
+    if (stat(filePath, &fileStat) < 0) {
+        perror("Failed to get file stats");
+        return 1;
+    }
+
+    checkPermissions(&fileStat);
+
+    struct passwd *pw = getpwuid(fileStat.st_uid);
+    if (pw != NULL) {
+        printf("File owner: %s\n", pw->pw_name);
+    } else {
+        printf("Owner UID: %d\n", fileStat.st_uid);
+    }
+
+    return 0;
+}
+
+void checkPermissions(struct stat *fileStat) {
+    printf("File Permissions: \n");
+    printf("Owner: "); printPermissions(fileStat->st_mode >> 6);
+    printf("Group: "); printPermissions(fileStat->st_mode >> 3);
+    printf("Others: "); printPermissions(fileStat->st_mode);
+
+    printf("\n");
+}
+
+void printPermissions(mode_t perm) {
+    printf("Read ");
+    if (perm & S_IRUSR) printf("Yes, ");
+    else printf("No, ");
+
+    printf("Write ");
+    if (perm & S_IWUSR) printf("Yes, ");
+    else printf("No, ");
+
+    printf("Execute ");
+    if (perm & S_IXUSR) printf("Yes\n");
+    else printf("No\n");
+}
