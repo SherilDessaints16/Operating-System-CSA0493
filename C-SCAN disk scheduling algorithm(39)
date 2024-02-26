@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_DISK_TRACK 199
+
+// Function to compare integers for qsort
+int cmpfunc(const void *a, const void *b) {
+    return (*(int *)a - *(int *)b);
+}
+
+// Function to calculate the total seek time in C-SCAN
+int calculateCSCANSeek(int requests[], int n, int start) {
+    int totalSeek = 0;
+    int last = MAX_DISK_TRACK; // Last track on the disk
+    int first = 0; // First track on the disk
+
+    // Sort the requests array
+    qsort(requests, n, sizeof(int), cmpfunc);
+
+    // Find the position to split the requests into two parts
+    int i;
+    for(i = 0; i < n && requests[i] < start; i++);
+
+    // If start is the smallest or beyond the largest request
+    if (i == n) {
+        totalSeek = (start - first) + (requests[n-1] - first);
+    } else if (i == 0) {
+        totalSeek = last - start + last - requests[0];
+    } else {
+        // Seek from start to the last, from last to the first (directly, not counted in seek), and from first to the first request before start
+        totalSeek = (last - start) + (last - first) + (requests[i-1] - first);
+    }
+
+    return totalSeek;
+}
+
+int main() {
+    int n; // Number of requests
+    int start; // Starting position of the disk head
+
+    // Input: Number of requests
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+
+    int requests[n]; // Array to hold the requests
+
+    // Input: The requests
+    printf("Enter the disk requests:\n");
+    for(int i = 0; i < n; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    // Input: Starting position of the disk head
+    printf("Enter the start position of the disk head: ");
+    scanf("%d", &start);
+
+    // Calculate the total seek time
+    int totalSeek = calculateCSCANSeek(requests, n, start);
+
+    printf("Total seek time: %d\n", totalSeek);
+
+    return 0;
+}
