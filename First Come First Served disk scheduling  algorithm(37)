@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h> // For abs()
+
+// Function to calculate the total seek time in FCFS scheduling
+int calculateTotalSeek(int requests[], int n, int start) {
+    int totalSeek = 0;
+    int currentPos = start;
+
+    for(int i = 0; i < n; i++) {
+        // Calculate the distance from the current position to the request
+        totalSeek += abs(requests[i] - currentPos);
+        // Move to the next request
+        currentPos = requests[i];
+    }
+
+    return totalSeek;
+}
+
+int main() {
+    int n; // Number of requests
+    int start; // Starting position of the disk head
+
+    // Input: Number of requests
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+
+    int requests[n]; // Array to hold the requests
+
+    // Input: The requests
+    printf("Enter the requests:\n");
+    for(int i = 0; i < n; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    // Input: Starting position of the disk head
+    printf("Enter the start position of the disk head: ");
+    scanf("%d", &start);
+
+    // Calculate the total seek time
+    int totalSeek = calculateTotalSeek(requests, n, start);
+
+    printf("Total seek time: %d\n", totalSeek);
+
+    return 0;
+}
