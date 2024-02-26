@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Define a structure for a file record
+typedef struct {
+    int id; // Unique identifier for the record
+    char data[256]; // Data of the record, simplified as a string
+} Record;
+
+// Function to add a record to the file
+void addRecord(Record **records, int *size, int id, const char *data) {
+    // Allocate or reallocate memory for the records array
+    if (*records == NULL) {
+        *records = (Record *)malloc(sizeof(Record));
+    } else {
+        *records = (Record *)realloc(*records, (*size + 1) * sizeof(Record));
+    }
+    
+    // Add the new record
+    (*records)[*size].id = id;
+    strncpy((*records)[*size].data, data, sizeof((*records)[*size].data) - 1);
+    (*records)[*size].data[sizeof((*records)[*size].data) - 1] = '\0'; // Ensure null-termination
+    (*size)++;
+}
+
+// Function to display all records
+void displayRecords(const Record *records, int size) {
+    printf("Displaying all records:\n");
+    for (int i = 0; i < size; i++) {
+        printf("ID: %d, Data: %s\n", records[i].id, records[i].data);
+    }
+}
+
+// Function to simulate accessing a record
+void accessRecord(const Record *records, int size, int id) {
+    printf("Accessing record with ID: %d\n", id);
+    for (int i = 0; i < size; i++) {
+        // Simulate reading through records
+        printf("Read through record ID: %d\n", records[i].id);
+        if (records[i].id == id) {
+            printf("Accessed Record - ID: %d, Data: %s\n", records[i].id, records[i].data);
+            return;
+        }
+    }
+    printf("Record with ID: %d not found.\n", id);
+}
+
+int main() {
+    Record *records = NULL;
+    int size = 0;
+
+    // Example usage
+    addRecord(&records, &size, 1, "First record");
+    addRecord(&records, &size, 2, "Second record");
+    addRecord(&records, &size, 3, "Third record");
+
+    displayRecords(records, size);
+
+    // Accessing a specific record
+    accessRecord(records, size, 2);
+
+    // Free allocated memory
+    free(records);
+
+    return 0;
+}
